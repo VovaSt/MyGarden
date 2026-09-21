@@ -20,6 +20,8 @@ test suites will be introduced in subsequent implementation milestones.
 
 The full model, REST API outline, ER diagram, and planned screens are in
 [the architecture document](docs/architecture.md).
+Database conventions, the initial migration, and local PostgreSQL setup are in
+[the database document](docs/database.md).
 
 ## Repository layout
 
@@ -42,6 +44,6 @@ presented as approximate and source-attributed where possible.
 
 ## Next milestone
 
-Scaffold the Angular and NestJS applications, add the Prisma schema and initial
-migration, then replace the bootstrap CI job with lint, unit-test, and build
-jobs for both applications.
+Scaffold the Angular and NestJS applications, install current Prisma tooling,
+apply the committed initial migration, then replace the bootstrap CI job with
+lint, unit-test, and build jobs for both applications.

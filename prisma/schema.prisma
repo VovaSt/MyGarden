@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GraftStatus {
+  ACTIVE
+  INACTIVE
+  REMOVED
+
+  @@map("graft_status")
+}
+
+enum MapReferenceObjectType {
+  BUILDING
+  FENCE
+
+  @@map("map_reference_object_type")
+}
+
+model Garden {
+  id                  String               @id @default(uuid()) @db.Uuid
+  name                String               @db.VarChar(120)
+  description         String?              @db.Text
+  widthMeters         Decimal              @db.Decimal(10, 2)
+  heightMeters        Decimal              @db.Decimal(10, 2)
+  trees               Tree[]
+  mapReferenceObjects MapReferenceObject[]
+  createdAt           DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime             @updatedAt @db.Timestamptz(6)
+
+  @@map("gardens")
+}
+
+model FruitSpecies {
+  id             String         @id @default(uuid()) @db.Uuid
+  name           String         @unique @db.VarChar(120)
+  scientificName String?        @db.VarChar(180)
+  trees          Tree[]
+  varieties      FruitVariety[]
+  createdAt      DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(6)
+
+  @@map("fruit_species")
+}
+
+model FruitVariety {
+  id                    String          @id @default(uuid()) @db.Uuid
+  speciesId             String          @db.Uuid
+  species               FruitSpecies    @relation(fields: [speciesId], references: [id], onDelete: Restrict)
+  name                  String          @db.VarChar(180)
+  aliases               String[]        @default([]) @db.Text
+  description           String?         @db.Text
+  harvestStartMonth     Int?
+  harvestStartDay       Int?
+  harvestEndMonth       Int?
+  harvestEndDay         Int?
+  typicalStorageDaysMin Int?
+  typicalStorageDaysMax Int?
+  storageConditions     String?         @db.Text
+  notes                 String?         @db.Text
+  grafts                Graft[]        @relation("VarietyGrafts")
+  sources               VarietySource[]
+  createdAt             DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime        @updatedAt @db.Timestamptz(6)
+
+  @@unique([speciesId, name])
+  @@unique([id, speciesId])
+  @@index([speciesId])
+  @@map("fruit_varieties")
+}
+
+model Tree {
+  id          String       @id @default(uuid()) @db.Uuid
+  gardenId    String       @db.Uuid
+  speciesId   String       @db.Uuid
+  garden      Garden       @relation(fields: [gardenId], references: [id], onDelete: Cascade)
+  species     FruitSpecies @relation(fields: [speciesId], references: [id], onDelete: Restrict)
+  label       String       @db.VarChar(120)
+  x           Decimal      @db.Decimal(10, 2)
+  y           Decimal      @db.Decimal(10, 2)
+  plantingDate DateTime?   @db.Date
+  notes       String?      @db.Text
+  grafts      Graft[]    @relation("TreeGrafts")
+  createdAt   DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(6)
+
+  @@unique([id, speciesId])
+  @@index([gardenId])
+  @@index([gardenId, speciesId])
+  @@map("trees")
+}
+
+model Graft {
+  id                       String        @id @default(uuid()) @db.Uuid
+  treeId                   String        @db.Uuid
+  varietyId                String        @db.Uuid
+  speciesId                String        @db.Uuid
+  tree                     Tree          @relation("TreeGrafts", fields: [treeId, speciesId], references: [id, speciesId], onDelete: Cascade)
+  variety                  FruitVariety  @relation("VarietyGrafts", fields: [varietyId, speciesId], references: [id, speciesId], onDelete: Restrict)
+  graftingDate             DateTime?     @db.Date
+  status                   GraftStatus   @default(ACTIVE)
+  harvestStartMonthOverride Int?
+  harvestStartDayOverride  Int?
+  harvestEndMonthOverride  Int?
+  harvestEndDayOverride    Int?
+  notes                    String?       @db.Text
+  createdAt                DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime      @updatedAt @db.Timestamptz(6)
+
+  @@index([treeId])
+  @@index([varietyId])
+  @@index([speciesId])
+  @@map("grafts")
+}
+
+model VarietySource {
+  id          String       @id @default(uuid()) @db.Uuid
+  varietyId   String       @db.Uuid
+  variety     FruitVariety @relation(fields: [varietyId], references: [id], onDelete: Cascade)
+  sourceName  String       @db.VarChar(180)
+  sourceUrl   String?      @db.Text
+  retrievedAt DateTime?    @db.Timestamptz(6)
+  notes       String?      @db.Text
+  createdAt   DateTime     @default(now()) @db.Timestamptz(6)
+
+  @@index([varietyId])
+  @@map("variety_sources")
+}
+
+model MapReferenceObject {
+  id              String                 @id @default(uuid()) @db.Uuid
+  gardenId        String                 @db.Uuid
+  garden          Garden                 @relation(fields: [gardenId], references: [id], onDelete: Cascade)
+  type            MapReferenceObjectType
+  label           String?                @db.VarChar(120)
+  x               Decimal                @db.Decimal(10, 2)
+  y               Decimal                @db.Decimal(10, 2)
+  widthMeters     Decimal?               @db.Decimal(10, 2)
+  heightMeters    Decimal?               @db.Decimal(10, 2)
+  endX            Decimal?               @db.Decimal(10, 2)
+  endY            Decimal?               @db.Decimal(10, 2)
+  rotationDegrees Decimal?               @db.Decimal(5, 2)
+  notes           String?                @db.Text
+  createdAt       DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime               @updatedAt @db.Timestamptz(6)
+
+  @@index([gardenId])
+  @@map("map_reference_objects")
+}

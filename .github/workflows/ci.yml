@@ -23,6 +23,9 @@ jobs:
           test -s Agents.md
           test -s README.md
           test -s docs/architecture.md
+          test -s docs/database.md
+          test -s prisma/schema.prisma
+          test -s prisma/migrations/20260921195000_initial_schema/migration.sql
 
       - name: Confirm planned workspace layout
         shell: bash
@@ -32,3 +35,5 @@ jobs:
           test -d packages/shared
           test -d prisma
           test -d e2e
+          test -f docker-compose.yml
+          test -f .env.example
