@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap-validation:
+    name: Validate repository bootstrap
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify required documentation
+        shell: bash
+        run: |
+          test -s Agents.md
+          test -s README.md
+          test -s docs/architecture.md
+
+      - name: Confirm planned workspace layout
+        shell: bash
+        run: |
+          test -d apps/frontend
+          test -d apps/backend
+          test -d packages/shared
+          test -d prisma
+          test -d e2e
