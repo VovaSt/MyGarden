@@ -42,6 +42,20 @@ The project follows the domain rules and agent guidelines in
 [Agents.md](Agents.md). Agricultural harvest and storage information is always
 presented as approximate and source-attributed where possible.
 
+## Backend and database setup
+
+1. Install Node.js 22.x or newer and Docker Desktop.
+2. Copy `.env.example` to `.env`.
+3. Run `docker compose up -d postgres` to start local PostgreSQL.
+4. Run `npm ci` to install the exact dependency versions from `package-lock.json`.
+5. Run `npm run db:migrate:deploy` to create/update the local tables.
+6. Run `npm run backend:start:dev` to start the API at
+   `http://localhost:3000/api`.
+
+`GET /api/health` is a technical health endpoint. The first domain API is
+`/api/gardens`, supporting creation, listing, retrieval, editing, and deletion
+of gardens.
+
 ## Next milestone
 
 Scaffold the Angular and NestJS applications, install current Prisma tooling,

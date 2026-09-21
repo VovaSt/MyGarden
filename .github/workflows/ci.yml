@@ -10,30 +10,34 @@ permissions:
   contents: read
 
 jobs:
-  bootstrap-validation:
-    name: Validate repository bootstrap
+  backend:
+    name: Validate backend and database schema
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Verify required documentation
-        shell: bash
-        run: |
-          test -s Agents.md
-          test -s README.md
-          test -s docs/architecture.md
-          test -s docs/database.md
-          test -s prisma/schema.prisma
-          test -s prisma/migrations/20260921195000_initial_schema/migration.sql
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
 
-      - name: Confirm planned workspace layout
-        shell: bash
-        run: |
-          test -d apps/frontend
-          test -d apps/backend
-          test -d packages/shared
-          test -d prisma
-          test -d e2e
-          test -f docker-compose.yml
-          test -f .env.example
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Prisma schema
+        run: npm run db:validate
+        env:
+          DATABASE_URL: postgresql://mygarden:ci@localhost:5432/mygarden?schema=public
+
+      - name: Generate Prisma client
+        run: npm run db:generate
+        env:
+          DATABASE_URL: postgresql://mygarden:ci@localhost:5432/mygarden?schema=public
+
+      - name: Run backend unit tests
+        run: npm run test --workspace=@mygarden/backend
+
+      - name: Build backend
+        run: npm run backend:build
