@@ -1,0 +1,81 @@
+<section class="page">
+  <a mat-button routerLink="/gardens">← До списку садів</a>
+
+  @if (loading()) {
+    <p>Завантаження карти…</p>
+  } @else if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  } @else if (garden(); as currentGarden) {
+    <header class="heading">
+      <div>
+        <h1>{{ currentGarden.name }}</h1>
+        <p>Схема ділянки: {{ currentGarden.widthMeters }} × {{ currentGarden.heightMeters }} м</p>
+      </div>
+      <div class="legend" aria-label="Умовні позначення">
+        <span><i class="tree-key"></i> Дерево</span>
+        <span><i class="building-key"></i> Будівля</span>
+        <span><i class="fence-key"></i> Паркан</span>
+      </div>
+    </header>
+
+    <div class="map-layout">
+      <mat-card class="map-card">
+        <mat-card-content>
+          <svg class="garden-map" [attr.viewBox]="'0 0 ' + currentGarden.widthMeters + ' ' + currentGarden.heightMeters" role="group" aria-label="Схематична карта саду">
+            <title>Карта саду {{ currentGarden.name }}</title>
+            <defs>
+              <pattern id="meter-grid" width="1" height="1" patternUnits="userSpaceOnUse">
+                <path d="M 1 0 L 0 0 0 1" class="grid-line" />
+              </pattern>
+            </defs>
+            <rect class="plot" x="0" y="0" [attr.width]="currentGarden.widthMeters" [attr.height]="currentGarden.heightMeters" />
+            <rect class="grid" x="0" y="0" [attr.width]="currentGarden.widthMeters" [attr.height]="currentGarden.heightMeters" />
+            @for (object of mapObjects(); track object.id) {
+              @if (object.type === 'BUILDING') {
+                <rect class="building" [attr.x]="coordinate(object.x)" [attr.y]="coordinate(object.y)" [attr.width]="coordinate(object.widthMeters)" [attr.height]="coordinate(object.heightMeters)">
+                  <title>{{ object.label || 'Будівля' }}</title>
+                </rect>
+              } @else {
+                <line class="fence" [attr.x1]="coordinate(object.x)" [attr.y1]="coordinate(object.y)" [attr.x2]="coordinate(object.endX)" [attr.y2]="coordinate(object.endY)">
+                  <title>{{ object.label || 'Паркан' }}</title>
+                </line>
+              }
+            }
+            @for (tree of trees(); track tree.id) {
+              <circle class="tree" [class.selected]="selectedTree()?.id === tree.id" [attr.cx]="coordinate(tree.x)" [attr.cy]="coordinate(tree.y)" r="0.38" tabindex="0" role="button" [attr.aria-label]="'Вибрати дерево ' + tree.label" (click)="selectTree(tree)" (keydown.enter)="selectTree(tree)" (keydown.space)="selectTree(tree)">
+                <title>{{ tree.label }} — {{ tree.species.name }}</title>
+              </circle>
+            }
+          </svg>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="details-card">
+        <mat-card-header><mat-card-title>Дерева</mat-card-title></mat-card-header>
+        <mat-card-content>
+          @for (tree of trees(); track tree.id) {
+            <button class="tree-list-item" type="button" [class.selected]="selectedTree()?.id === tree.id" (click)="selectTree(tree)">
+              <strong>{{ tree.label }}</strong>
+              <span>{{ tree.species.name }} · щеплень: {{ tree._count.grafts }}</span>
+            </button>
+          } @empty {
+            <p>На карті ще немає дерев.</p>
+          }
+
+          @if (selectedTree(); as tree) {
+            <section class="tree-details" aria-live="polite">
+              <h2>{{ tree.label }}</h2>
+              <p>{{ tree.species.name }} · координати {{ tree.x }} × {{ tree.y }} м</p>
+              @if (tree.notes) { <p>{{ tree.notes }}</p> }
+              <h3>Щеплені сорти</h3>
+              <ul>
+                @for (graft of tree.grafts; track graft.id) { <li>{{ graft.variety.name }}</li> }
+                @empty { <li>Щеплень ще не додано.</li> }
+              </ul>
+            </section>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+</section>

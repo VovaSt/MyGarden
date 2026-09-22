@@ -11,5 +11,6 @@ export class GardenApiService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = inject(API_BASE_URL);
   getAll(): Observable<Garden[]> { return this.http.get<Garden[]>(`${this.apiBaseUrl}/gardens`); }
+  getById(id: string): Observable<Garden> { return this.http.get<Garden>(`${this.apiBaseUrl}/gardens/${id}`); }
   create(request: CreateGardenRequest): Observable<Garden> { return this.http.post<Garden>(`${this.apiBaseUrl}/gardens`, request); }
 }
