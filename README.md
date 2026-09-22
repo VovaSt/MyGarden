@@ -49,8 +49,8 @@ presented as approximate and source-attributed where possible.
 3. Run `docker compose up -d postgres` to start local PostgreSQL.
 4. Run `npm ci` to install the exact dependency versions from `package-lock.json`.
 5. Run `npm run db:migrate:deploy` to create/update the local tables.
-6. Run `npm run backend:start:dev` to start the API at
-   `http://localhost:3000/api`.
+6. In a dedicated terminal, run `npm run backend:start:dev` to start the API at
+   `http://localhost:3000/api`. Keep this terminal open while developing.
 
 `GET /api/health` is a technical health endpoint. The first domain API is
 `/api/gardens`, supporting creation, listing, retrieval, editing, and deletion
@@ -62,8 +62,19 @@ filters narrow the result without creating or storing calendar-event records.
 
 ## Frontend setup
 
-With the backend running, use `npm run frontend:start` and open the local URL
-shown by Angular. The initial Gardens screen calls `http://localhost:3000/api`.
+With the backend running, use `npm run frontend:start` in a second terminal and
+open the local URL shown by Angular. The initial Gardens screen calls
+`http://localhost:3000/api`.
+
+During local development three processes have distinct responsibilities:
+
+```text
+Browser → Angular dev server (:4200) → NestJS API (:3000) → PostgreSQL (Docker, :5432)
+```
+
+The backend permits requests from the Angular development origin through
+`FRONTEND_ORIGIN`. This browser rule is called CORS; it prevents unrelated
+websites from calling the API from a visitor's browser.
 
 Run `npm run frontend:test` for Angular unit tests and `npm run frontend:build`
 for the static production build. The build output is suitable for GitHub Pages;
