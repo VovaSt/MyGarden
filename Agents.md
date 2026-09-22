@@ -1262,3 +1262,25 @@ Every change should fit into this lifecycle.
 The goal is not merely to generate code.
 
 The goal is to build a maintainable software system using AI-assisted engineering.
+
+---
+
+# 50. Code Review Rules
+
+## Backend and persistence
+
+* Flag controller business logic, missing DTO validation, and invalid foreign-key relationships.
+* Flag Prisma schema changes without a committed migration.
+* Flag migrations that can delete or silently rewrite existing data.
+* Flag API changes that expose internal errors, secrets, or database details.
+
+## Domain correctness
+
+* Flag grafts whose tree and variety species are not guaranteed to match.
+* Flag harvest calendar changes that persist derived events or present approximate dates as guarantees.
+* Flag map reference objects that affect harvest calculations or tree domain rules.
+
+## Review scope
+
+* Focus on material correctness, security, data integrity, and accessibility issues.
+* Leave formatting, linting, and other deterministic checks to CI.
