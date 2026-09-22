@@ -56,6 +56,10 @@ presented as approximate and source-attributed where possible.
 `/api/gardens`, supporting creation, listing, retrieval, editing, and deletion
 of gardens.
 
+`GET /api/harvest-calendar?gardenId=<uuid>` returns derived, approximate
+harvest entries. Optional `month`, `speciesId`, `treeId`, and `varietyId`
+filters narrow the result without creating or storing calendar-event records.
+
 ## Next milestone
 
 Scaffold the Angular and NestJS applications, install current Prisma tooling,
