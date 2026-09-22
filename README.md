@@ -5,9 +5,9 @@ and see approximate harvest periods and typical storage information.
 
 ## Status
 
-This repository currently contains the approved architecture and project
-bootstrap. The Angular frontend, NestJS backend, Prisma schema, and automated
-test suites will be introduced in subsequent implementation milestones.
+This repository contains an Angular frontend, NestJS backend, PostgreSQL/Prisma
+schema, and automated test suites. The first frontend screen creates and lists
+gardens through the REST API.
 
 ## Planned architecture
 
@@ -60,8 +60,16 @@ of gardens.
 harvest entries. Optional `month`, `speciesId`, `treeId`, and `varietyId`
 filters narrow the result without creating or storing calendar-event records.
 
+## Frontend setup
+
+With the backend running, use `npm run frontend:start` and open the local URL
+shown by Angular. The initial Gardens screen calls `http://localhost:3000/api`.
+
+Run `npm run frontend:test` for Angular unit tests and `npm run frontend:build`
+for the static production build. The build output is suitable for GitHub Pages;
+deployment base-path configuration will be added with the deployment workflow.
+
 ## Next milestone
 
-Scaffold the Angular and NestJS applications, install current Prisma tooling,
-apply the committed initial migration, then replace the bootstrap CI job with
-lint, unit-test, and build jobs for both applications.
+Build the interactive SVG garden map, then connect the harvest calendar,
+variety catalogue, and tree/graft editing screens to the API.

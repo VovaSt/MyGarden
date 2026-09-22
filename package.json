@@ -14,6 +14,9 @@
     "backend:build": "npm run build --workspace=@mygarden/backend",
     "backend:start": "npm run start --workspace=@mygarden/backend",
     "backend:start:dev": "npm run start:dev --workspace=@mygarden/backend",
+    "frontend:build": "npm run build --workspace=@mygarden/frontend",
+    "frontend:start": "npm run start --workspace=@mygarden/frontend",
+    "frontend:test": "npm run test --workspace=@mygarden/frontend",
     "db:generate": "prisma generate --schema prisma/schema.prisma",
     "db:migrate:deploy": "prisma migrate deploy --schema prisma/schema.prisma",
     "db:validate": "prisma validate --schema prisma/schema.prisma"
